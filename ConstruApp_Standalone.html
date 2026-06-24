@@ -1,0 +1,2197 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a73e8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ConstruApp">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <title>ConstruApp - APU Mobile</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Styles -->
+    <style>
+:root {
+    /* Color Palette - Contemporary Light Theme with Construction Accents */
+    --primary: #f59e0b; /* Amber/Orange - Construction vibe */
+    --primary-dark: #d97706;
+    --primary-light: #fef3c7;
+    
+    --bg-main: #f8fafc;
+    --bg-surface: #ffffff;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    
+    --success: #10b981; /* Green for budget OK */
+    --danger: #ef4444; /* Red for expenses */
+    --info: #3b82f6;
+    
+    --border-color: #e2e8f0;
+    
+    /* Typography */
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    
+    /* Metrics & Spacing */
+    --border-radius: 16px;
+    --border-radius-sm: 8px;
+    --border-radius-lg: 24px;
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-fab: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    overflow: hidden; /* Prevent body scrolling for app-like feel */
+}
+
+/* App Container (Mobile First) */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 480px; /* Limit width on desktop to look like mobile */
+    margin: 0 auto;
+    background-color: var(--bg-main);
+    position: relative;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 10;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.header-icon {
+    color: var(--primary);
+    width: 28px;
+    height: 28px;
+}
+
+.header-title h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.header-title .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: var(--spacing-sm);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover, .icon-btn:active {
+    background-color: var(--bg-main);
+    color: var(--primary);
+}
+
+/* Main Content Area */
+.app-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    padding-bottom: 90px; /* Space for bottom nav */
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background-color: var(--bg-surface);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 20;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
+}
+
+.nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    flex: 1;
+}
+
+.nav-item i {
+    width: 22px;
+    height: 22px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.nav-item.active {
+    color: var(--primary);
+}
+
+.nav-item.active i {
+    transform: translateY(-2px);
+}
+
+/* Floating Action Button */
+.fab-container {
+    position: relative;
+    top: -25px;
+    display: flex;
+    justify-content: center;
+}
+
+.fab {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-fab);
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fab:active {
+    transform: scale(0.95);
+}
+
+.fab i {
+    width: 26px;
+    height: 26px;
+}
+
+/* General Layout & Cards */
+.card {
+    background-color: var(--bg-surface);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Typography Helpers */
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
+.text-info { color: var(--info); }
+.text-muted { color: var(--text-muted); }
+
+/* Forms & Inputs */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    color: var(--text-primary);
+    background-color: var(--bg-main);
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+    background-color: var(--bg-surface);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: var(--border-radius-sm);
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:active {
+    background-color: var(--primary-dark);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-outline:active {
+    background-color: var(--bg-main);
+}
+
+/* Modals */
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    align-items: flex-end;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    background-color: var(--bg-surface);
+    width: 100%;
+    max-height: 90vh;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    padding: var(--spacing-lg) var(--spacing-md);
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-overlay.hidden .modal-content {
+    transform: translateY(100%);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.modal-header h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: var(--bg-main);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* Helpers */
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mt-1 { margin-top: var(--spacing-sm); }
+.mt-2 { margin-top: var(--spacing-md); }
+.mb-1 { margin-bottom: var(--spacing-sm); }
+.mb-2 { margin-bottom: var(--spacing-md); }
+
+/* ==========================================
+   Print Styles (PDF Export)
+========================================== */
+#print-report {
+    display: none;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #print-report, #print-report * {
+        visibility: visible;
+    }
+    #print-report {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: block;
+        padding: 20px;
+    }
+    .print-header {
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+    }
+    .print-summary {
+        margin-bottom: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        font-size: 14px;
+    }
+    .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+    .print-table th, .print-table td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+    .print-table th {
+        background-color: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+</style>
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <img src="data:image/jpeg;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//9k=" class="header-icon" style="width: 96px; height: 96px; object-fit: contain; border-radius: 4px;">
+                <div class="header-title">
+                    <h1>ConstruApp</h1>
+                    <span id="current-project-name" class="subtitle">Seleccionar Proyecto</span>
+                </div>
+            </div>
+            <button class="icon-btn" id="btn-projects" aria-label="Proyectos">
+                <i data-lucide="folder-kanban"></i>
+            </button>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="app-main" id="main-content">
+            <!-- Dynamic Content Injected Here -->
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-view="dashboard">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Resumen</span>
+            </button>
+            <button class="nav-item" data-view="expenses">
+                <i data-lucide="receipt"></i>
+                <span>Gastos</span>
+            </button>
+            <div class="fab-container">
+                <button class="fab" id="fab-add" aria-label="Añadir Registro">
+                    <i data-lucide="plus"></i>
+                </button>
+            </div>
+            <button class="nav-item" data-view="progress">
+            <i data-lucide="bar-chart-2"></i>
+            <span>Avance</span>
+        </button>
+        <button class="nav-item" data-view="reports">
+            <i data-lucide="pie-chart"></i>
+            <span>Reportes</span>
+        </button>
+        <button class="nav-item" data-view="budget">
+            <i data-lucide="circle-dollar-sign"></i>
+            <span>Ppto</span>
+        </button>
+        </nav>
+    </div>
+
+    <!-- Modals Overlay -->
+    <div class="modal-overlay hidden" id="modal-overlay"></div>
+
+    <!-- Scripts -->
+    <script>
+// UUID generator
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+class Store {
+    constructor() {
+        this.data = this.loadData();
+    }
+
+    loadData() {
+        const defaultData = {
+            projects: [],
+            currentProjectId: null
+        };
+        let data = defaultData;
+        try {
+            const stored = localStorage.getItem('construapp_data');
+            if (stored) data = JSON.parse(stored);
+        } catch (e) {
+            console.error("LocalStorage error", e);
+            alert("No se pudo acceder a la memoria. Si abriste esto desde WhatsApp, por favor ábrelo en tu navegador Chrome o Safari.");
+        }
+        
+        // Migrate data to new schema
+        if (data.projects) {
+            data.projects = data.projects.map(p => this.migrateProject(p));
+        }
+        return data;
+    }
+
+    saveData() {
+        try {
+            localStorage.setItem('construapp_data', JSON.stringify(this.data));
+        } catch (e) {
+            console.error("LocalStorage save error", e);
+        }
+    }
+
+    migrateProject(p) {
+        if (p.area === undefined) {
+            p.area = 0;
+        }
+        if (!p.budgets) {
+            p.budgets = [{ id: 'main', name: 'Presupuesto Principal', amount: p.budget || 0 }];
+            if (p.extraBudget > 0) {
+                p.budgets.push({ id: 'extra', name: 'Presupuesto Adicional', amount: p.extraBudget });
+            }
+            delete p.budget;
+            delete p.extraBudget;
+        }
+        if (!p.incomes) p.incomes = [];
+        if (!p.phases) {
+            p.phases = [];
+            if (p.progress && p.progress.length > 0) {
+                p.phases.push({
+                    id: 'general',
+                    name: 'Avance General',
+                    totalAmount: p.progress.reduce((sum, prog) => sum + prog.amount, 0),
+                    unit: p.progress[0].unit || 'm²',
+                    progress: p.progress
+                });
+            }
+            delete p.progress;
+        }
+        if (p.expenses) {
+            p.expenses.forEach(e => {
+                if (!e.budgetId) e.budgetId = 'main';
+            });
+        }
+        return p;
+    }
+
+    // Projects API
+    createProject(name, initialBudget, area) {
+        const newProject = {
+            id: generateUUID(),
+            name: name,
+            budgets: [{ id: 'main', name: 'Presupuesto Principal', amount: parseFloat(initialBudget) || 0 }],
+            area: parseFloat(area) || 0,
+            incomes: [],
+            pendingLabor: 0,
+            expenses: [],
+            phases: [],
+            createdAt: new Date().toISOString()
+        };
+        this.data.projects.push(newProject);
+        if (!this.data.currentProjectId) {
+            this.data.currentProjectId = newProject.id;
+        }
+        this.saveData();
+        return newProject;
+    }
+
+    editProject(id, name, area) {
+        const project = this.data.projects.find(p => p.id === id);
+        if (project) {
+            project.name = name;
+            project.area = parseFloat(area) || 0;
+            this.saveData();
+        }
+    }
+
+    getCurrentProject() {
+        if (!this.data.currentProjectId) return null;
+        return this.data.projects.find(p => p.id === this.data.currentProjectId);
+    }
+
+    setCurrentProject(id) {
+        this.data.currentProjectId = id;
+        this.saveData();
+    }
+
+    // Budgets API
+    addBudget(name, amount) {
+        const project = this.getCurrentProject();
+        if (project) {
+            project.budgets.push({
+                id: generateUUID(),
+                name: name,
+                amount: parseFloat(amount) || 0
+            });
+            this.saveData();
+        }
+    }
+
+    editBudget(id, name, amount) {
+        const project = this.getCurrentProject();
+        if (project) {
+            const b = project.budgets.find(b => b.id === id);
+            if (b) {
+                b.name = name;
+                b.amount = parseFloat(amount) || 0;
+                this.saveData();
+            }
+        }
+    }
+
+    deleteBudget(id) {
+        const project = this.getCurrentProject();
+        if (project) {
+            project.budgets = project.budgets.filter(b => b.id !== id);
+            // Move expenses to main if budget is deleted
+            project.expenses.forEach(e => {
+                if (e.budgetId === id) e.budgetId = 'main';
+            });
+            this.saveData();
+        }
+    }
+
+    getTotalBudget() {
+        const project = this.getCurrentProject();
+        if (!project) return 0;
+        return project.budgets.reduce((sum, b) => sum + b.amount, 0);
+    }
+
+    // Incomes (Anticipos) API
+    addIncome(description, amount) {
+        const project = this.getCurrentProject();
+        if (project) {
+            project.incomes.push({
+                id: generateUUID(),
+                description: description,
+                amount: parseFloat(amount) || 0,
+                date: new Date().toISOString()
+            });
+            this.saveData();
+        }
+    }
+
+    editIncome(id, description, amount) {
+        const project = this.getCurrentProject();
+        if (project) {
+            const inc = project.incomes.find(i => i.id === id);
+            if (inc) {
+                inc.description = description;
+                inc.amount = parseFloat(amount) || 0;
+                this.saveData();
+            }
+        }
+    }
+
+    deleteIncome(id) {
+        const project = this.getCurrentProject();
+        if (project) {
+            project.incomes = project.incomes.filter(i => i.id !== id);
+            this.saveData();
+        }
+    }
+
+    getTotalIncomes() {
+        const project = this.getCurrentProject();
+        if (!project) return 0;
+        return project.incomes.reduce((sum, i) => sum + i.amount, 0);
+    }
+
+    // Pending Labor API
+    setPendingLabor(amount) {
+        const project = this.getCurrentProject();
+        if (project) {
+            project.pendingLabor = parseFloat(amount) || 0;
+            this.saveData();
+        }
+    }
+
+    // Expenses API
+    addExpense(type, amount, description, budgetId) {
+        const project = this.getCurrentProject();
+        if (project) {
+            project.expenses.push({
+                id: generateUUID(),
+                type: type,
+                amount: parseFloat(amount) || 0,
+                description: description,
+                budgetId: budgetId || 'main',
+                date: new Date().toISOString()
+            });
+            this.saveData();
+        }
+    }
+
+    editExpense(expenseId, amount, description, budgetId) {
+        const project = this.getCurrentProject();
+        if (project) {
+            const exp = project.expenses.find(e => e.id === expenseId);
+            if (exp) {
+                exp.amount = parseFloat(amount) || 0;
+                exp.description = description;
+                if (budgetId) exp.budgetId = budgetId;
+                this.saveData();
+            }
+        }
+    }
+
+    deleteExpense(expenseId) {
+        const project = this.getCurrentProject();
+        if (project) {
+            project.expenses = project.expenses.filter(e => e.id !== expenseId);
+            this.saveData();
+        }
+    }
+
+    getTotalExpenses() {
+        const project = this.getCurrentProject();
+        if (!project) return 0;
+        return project.expenses.reduce((sum, exp) => sum + exp.amount, 0);
+    }
+
+    getExpensesByType(type) {
+        const project = this.getCurrentProject();
+        if (!project) return 0;
+        return project.expenses.filter(e => e.type === type).reduce((sum, exp) => sum + exp.amount, 0);
+    }
+
+    exportBackup() {
+        const dataStr = JSON.stringify(this.data);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ConstruApp_Backup_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    async restoreBackup(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.projects) {
+                        this.data = parsed;
+                        this.saveData();
+                        resolve(true);
+                    } else {
+                        reject(new Error("Formato inválido"));
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            reader.onerror = () => reject(new Error("Error leyendo archivo"));
+            reader.readAsText(file);
+        });
+    }
+
+    // Phases & Progress API
+    addPhase(name, totalAmount, unit) {
+        const project = this.getCurrentProject();
+        if (project) {
+            project.phases.push({
+                id: generateUUID(),
+                name: name,
+                totalAmount: parseFloat(totalAmount) || 0,
+                unit: unit,
+                progress: []
+            });
+            this.saveData();
+        }
+    }
+
+    editPhase(id, name, totalAmount, unit) {
+        const project = this.getCurrentProject();
+        if (project) {
+            const phase = project.phases.find(p => p.id === id);
+            if (phase) {
+                phase.name = name;
+                phase.totalAmount = parseFloat(totalAmount) || 0;
+                phase.unit = unit;
+                this.saveData();
+            }
+        }
+    }
+
+    deletePhase(id) {
+        const project = this.getCurrentProject();
+        if (project) {
+            project.phases = project.phases.filter(p => p.id !== id);
+            this.saveData();
+        }
+    }
+
+    addProgressToPhase(phaseId, amount) {
+        const project = this.getCurrentProject();
+        if (project) {
+            const phase = project.phases.find(p => p.id === phaseId);
+            if (phase) {
+                phase.progress.push({
+                    id: generateUUID(),
+                    amount: parseFloat(amount) || 0,
+                    date: new Date().toISOString()
+                });
+                this.saveData();
+            }
+        }
+    }
+
+    editProgress(phaseId, progressId, amount) {
+        const project = this.getCurrentProject();
+        if (project) {
+            const phase = project.phases.find(p => p.id === phaseId);
+            if (phase) {
+                const prog = phase.progress.find(p => p.id === progressId);
+                if (prog) {
+                    prog.amount = parseFloat(amount) || 0;
+                    this.saveData();
+                }
+            }
+        }
+    }
+
+    deleteProgress(phaseId, progressId) {
+        const project = this.getCurrentProject();
+        if (project) {
+            const phase = project.phases.find(p => p.id === phaseId);
+            if (phase) {
+                phase.progress = phase.progress.filter(p => p.id !== progressId);
+                this.saveData();
+            }
+        }
+    }
+
+    getCompletedPhases() {
+        const project = this.getCurrentProject();
+        if (!project) return [];
+        return project.phases.filter(phase => {
+            if (phase.totalAmount <= 0) return false;
+            const currentProgress = phase.progress.reduce((s, p) => s + p.amount, 0);
+            return currentProgress >= phase.totalAmount;
+        });
+    }
+
+    getPhaseProgressAmount(phaseId) {
+        const project = this.getCurrentProject();
+        if (!project) return 0;
+        const phase = project.phases.find(p => p.id === phaseId);
+        if (!phase) return 0;
+        return phase.progress.reduce((sum, p) => sum + p.amount, 0);
+    }
+
+    getTotalProgressAmount() {
+        const project = this.getCurrentProject();
+        if (!project) return 0;
+        return project.phases.reduce((sum, phase) => {
+            return sum + phase.progress.reduce((s, p) => s + p.amount, 0);
+        }, 0);
+    }
+
+    getGlobalPhysicalProgressPercent() {
+        const project = this.getCurrentProject();
+        if (!project || project.phases.length === 0) return 0;
+        
+        let totalPercent = 0;
+        let validPhases = 0;
+        project.phases.forEach(phase => {
+            if (phase.totalAmount > 0) {
+                const phaseProgress = phase.progress.reduce((s, p) => s + p.amount, 0);
+                const percent = Math.min((phaseProgress / phase.totalAmount), 1); // 0 to 1
+                totalPercent += percent;
+                validPhases++;
+            }
+        });
+        
+        if (validPhases === 0) return 0;
+        return totalPercent / validPhases; // 0 to 1
+    }
+
+    getEarnedValue() {
+        const totalBudget = this.getTotalBudget();
+        const globalProgress = this.getGlobalPhysicalProgressPercent();
+        return totalBudget * globalProgress;
+    }
+
+    // Dashboard Calculations
+    getCostPerUnit() {
+        const project = this.getCurrentProject();
+        if (!project || !project.area || project.area <= 0) return 0;
+        return this.getTotalExpenses() / project.area;
+    }
+
+    getBudgetPercentage() {
+        const totalBudget = this.getTotalBudget();
+        if (totalBudget === 0) return 0;
+        const percentage = (this.getTotalExpenses() / totalBudget) * 100;
+        return Math.min(percentage, 100);
+    }
+}
+
+window.appStore = new Store();
+
+</script>
+    <script>
+class AppUI {
+    constructor(store) {
+        this.store = store;
+        this.currentView = 'dashboard';
+        
+        // DOM Elements
+        this.mainContent = document.getElementById('main-content');
+        this.modalOverlay = document.getElementById('modal-overlay');
+        this.btnProjects = document.getElementById('btn-projects');
+        this.fabAdd = document.getElementById('fab-add');
+        this.navItems = document.querySelectorAll('.nav-item');
+        this.projectNameDisplay = document.getElementById('current-project-name');
+
+        this.printArea = document.createElement('div');
+        this.printArea.id = 'print-report';
+        document.body.appendChild(this.printArea);
+
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+        
+        if (!this.store.data.projects || this.store.data.projects.length === 0) {
+            this.showProjectsView();
+        } else {
+            this.updateHeader();
+            this.renderView('dashboard');
+        }
+    }
+
+    bindEvents() {
+        this.navItems.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const view = e.currentTarget.dataset.view;
+                this.navItems.forEach(n => n.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                this.renderView(view);
+            });
+        });
+
+        this.fabAdd.addEventListener('click', () => {
+            this.showAddMenuModal();
+        });
+
+        this.btnProjects.addEventListener('click', () => {
+            this.showProjectsView();
+        });
+
+        this.modalOverlay.addEventListener('click', (e) => {
+            if (e.target === this.modalOverlay) {
+                this.closeModal();
+            }
+        });
+    }
+
+    updateHeader() {
+        const project = this.store.getCurrentProject();
+        if (project) {
+            this.projectNameDisplay.textContent = project.name;
+        } else {
+            this.projectNameDisplay.textContent = 'Sin Proyecto Activo';
+        }
+    }
+
+    formatCurrency(amount) {
+        return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+    }
+
+    formatNumber(num) {
+        return new Intl.NumberFormat('es-MX', { maximumFractionDigits: 2 }).format(num);
+    }
+
+    // ==========================================
+    // View Rendering
+    // ==========================================
+
+    renderView(viewName) {
+        this.currentView = viewName;
+        this.mainContent.innerHTML = '';
+
+        const project = this.store.getCurrentProject();
+        if (!project && viewName !== 'projects') {
+            this.mainContent.innerHTML = `
+                <div style="text-align:center; padding: 40px 20px;">
+                    <i data-lucide="folder-plus" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                    <p style="color: var(--text-secondary);">Por favor crea o selecciona un proyecto para comenzar.</p>
+                    <button class="btn btn-primary mt-2" onclick="app.showProjectsView()">Ver Proyectos</button>
+                </div>
+            `;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            return;
+        }
+
+        switch(viewName) {
+            case 'dashboard': this.renderDashboard(project); break;
+            case 'expenses': this.renderExpenses(project); break;
+            case 'progress': this.renderProgress(project); break;
+            case 'reports': this.renderReports(project); break;
+            case 'budget': this.renderBudget(project); break;
+        }
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    renderDashboard(project) {
+        const totalBudget = this.store.getTotalBudget();
+        const totalExpenses = this.store.getTotalExpenses();
+        const totalIncomes = this.store.getTotalIncomes();
+        const budgetPercent = this.store.getBudgetPercentage();
+        const totalProgress = this.store.getTotalProgressAmount();
+        const apu = this.store.getCostPerUnit();
+
+        let progressColor = budgetPercent > 90 ? 'var(--danger)' : (budgetPercent > 70 ? 'var(--primary)' : 'var(--success)');
+
+        const totalMat = this.store.getExpensesByType('material');
+        const totalLab = this.store.getExpensesByType('labor');
+
+        this.mainContent.innerHTML = `
+            <div class="card" style="background: linear-gradient(135deg, var(--bg-surface), #fffaf0);">
+                <div class="flex-between mb-1">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Presupuesto Consumido</span>
+                    <span style="font-weight: 700; color: ${progressColor};">${budgetPercent.toFixed(1)}%</span>
+                </div>
+                <div style="width: 100%; background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 16px;">
+                    <div style="width: ${budgetPercent}%; background: ${progressColor}; height: 100%; transition: width 1s ease;"></div>
+                </div>
+                <div class="flex-between">
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Gastos Materiales</div>
+                        <div style="font-size: 1rem; font-weight: 700; color: #f59e0b;">${this.formatCurrency(totalMat)}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Mano de Obra</div>
+                        <div style="font-size: 1rem; font-weight: 700; color: #3b82f6;">${this.formatCurrency(totalLab)}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 8px;" class="flex-between">
+                    <div style="font-size: 0.8rem; font-weight: 600;">Gasto Total:</div>
+                    <div style="font-size: 1.1rem; font-weight: 800;">${this.formatCurrency(totalExpenses)}</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div class="card" style="margin-bottom: 0;">
+                    <i data-lucide="wallet" style="color: var(--success); margin-bottom: 8px;"></i>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Anticipos (Recibido)</div>
+                    <div style="font-weight: 700; color: var(--success);">${this.formatCurrency(totalIncomes)}</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">Balance: ${this.formatCurrency(totalIncomes - totalExpenses)}</div>
+                </div>
+                <div class="card" style="margin-bottom: 0; cursor: pointer;" onclick="app.showEditPendingLaborModal()">
+                    <i data-lucide="users" style="color: var(--primary); margin-bottom: 8px;"></i>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Mano de Obra</div>
+                    <div style="font-weight: 600;">${project.expenses.filter(e=>e.type==='labor').length} reg.</div>
+                    <div style="font-size: 0.75rem; color: var(--danger); margin-top: 4px; font-weight: 600;">Pendiente: ${this.formatCurrency(project.pendingLabor || 0)}</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i data-lucide="activity" style="color: var(--primary);"></i>
+                    Métricas Globales y APU
+                </div>
+                <div style="display: flex; align-items: center; justify-content: center; padding: 10px 0; flex-direction: column; border-bottom: 1px solid var(--border-color); margin-bottom: 12px; padding-bottom: 16px;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Costo Unitario por m² de Construcción</div>
+                    <div style="font-size: 2.2rem; font-weight: 800; color: var(--text-primary); letter-spacing: -1px;">
+                        ${this.formatCurrency(apu)} <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">/ m²</span>
+                    </div>
+                </div>
+                <div class="flex-between">
+                    <div style="text-align: center; flex: 1; border-right: 1px solid var(--border-color);">
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Área de Construcción</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">${this.formatNumber(project.area || 0)} m²</div>
+                    </div>
+                    <div style="text-align: center; flex: 1;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Avance Financiero</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">${budgetPercent.toFixed(1)}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EARNED VALUE MANAGEMENT -->
+            ${this.renderEVMCard()}
+        `;
+    }    renderEVMCard() {
+        const incomes = this.store.getTotalIncomes();
+        const ac = this.store.getTotalExpenses();
+        const profit = incomes - ac;
+        const profitMargin = incomes > 0 ? (profit / incomes) * 100 : 0;
+        
+        // "si el mismo baja al menos del 10 porciento debe colocarlo en rojo"
+        const isGood = profitMargin >= 10;
+        const color = isGood ? 'var(--success)' : 'var(--danger)';
+        const icon = isGood ? 'trending-up' : 'trending-down';
+        const message = isGood ? 'Margen de ganancia mayor al 10%' : 'Alerta: Ganancia menor al 10%';
+
+        return `
+            <div class="card" style="border-left: 4px solid ${color};">
+                <div class="flex-between mb-2">
+                    <div class="card-title" style="margin-bottom: 0;">Análisis de Rentabilidad</div>
+                    <i data-lucide="${icon}" style="color: ${color};"></i>
+                </div>
+                
+                <div class="flex-between" style="margin-bottom: 8px;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Anticipos Recibidos (Ingresos)</div>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">${this.formatCurrency(incomes)}</div>
+                </div>
+                <div class="flex-between" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Costo Real (Gasto Actual)</div>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">${this.formatCurrency(ac)}</div>
+                </div>
+                <div class="flex-between">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: ${color};">Ganancia Real:</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: ${color};">${this.formatCurrency(profit)} (${profitMargin.toFixed(1)}%)</div>
+                </div>
+                <div style="text-align: right; font-size: 0.75rem; color: ${color}; margin-top: 4px;">
+                    ${message}
+                </div>
+            </div>
+        `;
+    }
+
+    renderExpenses(project) {
+        const expenses = project.expenses.slice().reverse();
+        
+        let html = `
+            <div class="flex-between mb-2">
+                <div class="card-title" style="margin-bottom: 0;">Historial de Gastos</div>
+                <div style="display:flex; gap: 8px; align-items:center;">
+                    <button class="icon-btn" style="border: 1px solid var(--border-color);" onclick="app.showPDFOptionsModal()" title="Generar Informe PDF">
+                        <i data-lucide="printer" style="width:16px;height:16px; color: var(--text-secondary);"></i>
+                    </button>
+                    <div style="background: var(--bg-surface); padding: 8px 12px; border-radius: var(--border-radius-sm); border: 1px solid var(--danger); display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="app.showEditPendingLaborModal()">
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">Pendiente M. Obra</div>
+                            <div style="font-size: 0.9rem; font-weight: 700; color: var(--danger);">${this.formatCurrency(project.pendingLabor || 0)}</div>
+                        </div>
+                        <i data-lucide="edit-2" style="width: 14px; height: 14px; color: var(--danger);"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (expenses.length === 0) {
+            html += `<p style="color: var(--text-muted); text-align: center; padding: 20px;">No hay gastos registrados.</p>`;
+        } else {
+            html += `<div style="display: flex; flex-direction: column; gap: 12px;">`;
+            expenses.forEach(exp => {
+                const date = new Date(exp.date).toLocaleDateString();
+                const isMaterial = exp.type === 'material';
+                const icon = isMaterial ? 'package' : 'users';
+                const color = isMaterial ? '#f59e0b' : '#3b82f6';
+                const budget = project.budgets.find(b => b.id === exp.budgetId);
+                const budgetName = budget ? budget.name : 'Presupuesto';
+
+                html += `
+                    <div onclick="app.showEditExpenseModal('${exp.id}')" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--bg-surface); border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); transition: background 0.2s ease;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="background: ${color}20; color: ${color}; padding: 10px; border-radius: 50%;">
+                                <i data-lucide="${icon}" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.95rem;">${exp.description}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted);">${date} • ${budgetName}</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="font-weight: 700; color: var(--danger);">-${this.formatCurrency(exp.amount)}</div>
+                            <i data-lucide="chevron-right" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+        }
+        
+        this.mainContent.innerHTML = html;
+    }
+
+    renderProgress(project) {
+        let html = `
+            <div class="flex-between mb-2">
+                <div class="card-title" style="margin-bottom: 0;">Fases de Obra</div>
+                <div style="display:flex; gap: 8px;">
+                    <button class="btn btn-outline" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="app.showImportCSVModal()">
+                        <i data-lucide="upload" style="width:14px;height:14px;"></i> CSV
+                    </button>
+                    <button class="btn btn-primary" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="app.showAddPhaseModal()">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i> Nueva
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (!project.phases || project.phases.length === 0) {
+            html += `<p style="color: var(--text-muted); text-align: center; padding: 20px;">No hay fases. Crea una para empezar a registrar avances.</p>`;
+        } else {
+            project.phases.forEach(phase => {
+                const totalProgress = this.store.getPhaseProgressAmount(phase.id);
+                const percent = phase.totalAmount > 0 ? Math.min((totalProgress / phase.totalAmount) * 100, 100) : 0;
+                const pending = Math.max(phase.totalAmount - totalProgress, 0);
+                
+                html += `
+                    <div class="card">
+                        <div class="flex-between mb-1">
+                            <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">${phase.name}</div>
+                            <div style="display:flex; gap: 8px;">
+                                <button class="icon-btn" style="padding: 4px;" onclick="app.showEditPhaseModal('${phase.id}')"><i data-lucide="edit" style="width:16px;height:16px;"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-between" style="font-size: 0.8rem; margin-bottom: 4px;">
+                            <span style="color: var(--text-secondary);">Progreso: ${this.formatNumber(totalProgress)} / ${this.formatNumber(phase.totalAmount)} ${phase.unit}</span>
+                            <span style="font-weight: 700; color: var(--success);">${percent.toFixed(1)}%</span>
+                        </div>
+                        
+                        <div style="width: 100%; background: var(--border-color); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 12px;">
+                            <div style="width: ${percent}%; background: var(--success); height: 100%;"></div>
+                        </div>
+                        
+                        <div class="flex-between mb-2" style="font-size: 0.8rem;">
+                            <span style="color: var(--text-muted);">Pendiente: <strong>${this.formatNumber(pending)} ${phase.unit}</strong></span>
+                        </div>
+
+                        <div style="background: var(--bg-main); border-radius: var(--border-radius-sm); padding: 8px;">
+                            <div class="flex-between mb-1">
+                                <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">REGISTROS DE AVANCE</span>
+                                <button class="btn btn-primary" style="width: auto; padding: 4px 8px; font-size: 0.7rem;" onclick="app.showAddProgressToPhaseModal('${phase.id}')">
+                                    <i data-lucide="plus" style="width:12px;height:12px;"></i> Añadir
+                                </button>
+                            </div>
+                            ${phase.progress.length === 0 ? '<div style="font-size: 0.75rem; color: var(--text-muted);">Sin registros aún.</div>' : ''}
+                            ${phase.progress.slice().reverse().map(prog => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border-color); font-size: 0.8rem;">
+                                    <span style="color: var(--text-muted);">${new Date(prog.date).toLocaleDateString()}</span>
+                                    <div style="display:flex; align-items: center; gap: 8px;">
+                                        <span style="font-weight: 600; color: var(--success);">+${this.formatNumber(prog.amount)} ${phase.unit}</span>
+                                        <i data-lucide="edit-2" style="width:12px;height:12px; cursor:pointer; color:var(--text-muted);" onclick="app.showEditProgressModal('${phase.id}', '${prog.id}')"></i>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        this.mainContent.innerHTML = html;
+    }
+
+    renderReports(project) {
+        const totalIncomes = this.store.getTotalIncomes();
+        const ac = this.store.getTotalExpenses();
+        const profit = totalIncomes - ac;
+        
+        const totalMat = this.store.getExpensesByType('material');
+        const totalLab = this.store.getExpensesByType('labor');
+        
+        const total = totalMat + totalLab;
+        const matPercent = total > 0 ? (totalMat / total) * 100 : 0;
+        const labPercent = total > 0 ? (totalLab / total) * 100 : 0;
+
+        const completedPhases = this.store.getCompletedPhases();
+
+        let html = `
+            <div class="flex-between mb-2">
+                <div class="card-title" style="margin: 0;">Reportes Analíticos</div>
+                <button class="btn btn-outline" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="app.showExecutiveSummaryOptionsModal()">
+                    <i data-lucide="file-text" style="width:14px;height:14px;"></i> PDF
+                </button>
+            </div>
+            
+            <div class="card">
+                <h3 style="margin: 0 0 16px 0; font-size: 1rem;">Distribución de Gastos</h3>
+                <div style="display:flex; align-items:center; gap: 16px;">
+                    <div style="width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(#f59e0b ${matPercent}%, #3b82f6 ${matPercent}% 100%);"></div>
+                    <div style="flex:1;">
+                        <div class="flex-between mb-1">
+                            <div style="font-size: 0.8rem;"><span style="display:inline-block; width:10px; height:10px; background:#f59e0b; border-radius:50%; margin-right:4px;"></span>Materiales</div>
+                            <div style="font-weight: 700; font-size: 0.9rem;">${matPercent.toFixed(1)}%</div>
+                        </div>
+                        <div class="flex-between">
+                            <div style="font-size: 0.8rem;"><span style="display:inline-block; width:10px; height:10px; background:#3b82f6; border-radius:50%; margin-right:4px;"></span>Mano de Obra</div>
+                            <div style="font-weight: 700; font-size: 0.9rem;">${labPercent.toFixed(1)}%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin: 0 0 16px 0; font-size: 1rem;">Desempeño (Anticipos vs Gasto)</h3>
+                <div style="margin-bottom: 8px;">
+                    <div class="flex-between" style="font-size: 0.8rem; margin-bottom: 4px;">
+                        <span>Anticipos Recibidos</span>
+                        <span style="font-weight: 700; color: var(--success);">${this.formatCurrency(totalIncomes)}</span>
+                    </div>
+                    <div style="width: 100%; background: var(--border-color); height: 12px; border-radius: 6px; overflow: hidden;">
+                        <div style="width: ${Math.min((totalIncomes / (Math.max(totalIncomes, ac) || 1)) * 100, 100)}%; background: var(--success); height: 100%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex-between" style="font-size: 0.8rem; margin-bottom: 4px;">
+                        <span>Gasto Real (Costo)</span>
+                        <span style="font-weight: 700; color: var(--danger);">${this.formatCurrency(ac)}</span>
+                    </div>
+                    <div style="width: 100%; background: var(--border-color); height: 12px; border-radius: 6px; overflow: hidden;">
+                        <div style="width: ${Math.min((ac / (Math.max(totalIncomes, ac) || 1)) * 100, 100)}%; background: var(--danger); height: 100%;"></div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; text-align: center; font-size: 0.9rem;">
+                    <strong>Ganancia Real:</strong> <span style="color: ${profit >= 0 ? 'var(--success)' : 'var(--danger)'}">${this.formatCurrency(profit)}</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="flex-between mb-2">
+                    <h3 style="margin: 0; font-size: 1rem;">Partidas Listas para Cobro</h3>
+                    <span style="font-size:0.8rem; background:var(--success); color:#fff; padding:2px 6px; border-radius:10px;">${completedPhases.length}</span>
+                </div>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Partidas con 100% de ejecución física.</div>
+                ${completedPhases.length === 0 ? '<div style="text-align:center; color:var(--text-muted); font-size:0.8rem; padding: 10px;">No hay partidas al 100% aún.</div>' : ''}
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    ${completedPhases.map(p => `
+                        <div style="background:var(--bg-default); border:1px solid var(--border-color); padding:8px 12px; border-radius:var(--border-radius-sm); display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-size:0.85rem; font-weight:600;">${p.name}</div>
+                                <div style="font-size:0.75rem; color:var(--text-muted);">${p.totalAmount} ${p.unit}</div>
+                            </div>
+                            <i data-lucide="check-circle" style="color:var(--success); width:18px; height:18px;"></i>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        this.mainContent.innerHTML = html;
+    }
+
+    renderBudget(project) {
+        let html = `
+            <div class="card-title mb-2">Gestión Financiera</div>
+            
+            <!-- SECCIÓN PRESUPUESTOS -->
+            <div class="card">
+                <div class="flex-between mb-2">
+                    <div style="font-weight: 600; color: var(--text-primary);"><i data-lucide="layers" style="width:18px;height:18px; color:var(--primary); vertical-align:middle; margin-right:4px;"></i> Segmentos de Presupuesto</div>
+                    <button class="btn btn-outline" style="width: auto; padding: 4px 8px; font-size: 0.75rem;" onclick="app.showAddBudgetModal()">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i> Adicional
+                    </button>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    ${project.budgets.map(b => `
+                        <div style="background: var(--bg-main); padding: 12px; border-radius: var(--border-radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">${b.name}</div>
+                                <div style="font-size: 1.1rem; font-weight: 700;">${this.formatCurrency(b.amount)}</div>
+                            </div>
+                            <button class="icon-btn" onclick="app.showEditBudgetModal('${b.id}')"><i data-lucide="edit-2" style="width:16px;height:16px;"></i></button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="text-align: right; margin-top: 12px; font-size: 0.9rem; font-weight: 700; color: var(--success);">
+                    Total: ${this.formatCurrency(this.store.getTotalBudget())}
+                </div>
+            </div>
+
+            <!-- SECCIÓN ANTICIPOS -->
+            <div class="card">
+                <div class="flex-between mb-2">
+                    <div style="font-weight: 600; color: var(--text-primary);"><i data-lucide="hand-coins" style="width:18px;height:18px; color:var(--success); vertical-align:middle; margin-right:4px;"></i> Anticipos Entregados (Ingresos)</div>
+                    <button class="btn btn-outline" style="width: auto; padding: 4px 8px; font-size: 0.75rem;" onclick="app.showAddIncomeModal()">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i> Ingreso
+                    </button>
+                </div>
+                ${project.incomes.length === 0 ? '<p style="font-size:0.8rem; color:var(--text-muted);">No has registrado anticipos del cliente.</p>' : ''}
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    ${project.incomes.map(i => `
+                        <div style="background: #f0fdf4; padding: 12px; border-radius: var(--border-radius-sm); border: 1px solid #bbf7d0; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">${i.description}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">${new Date(i.date).toLocaleDateString()}</div>
+                            </div>
+                            <div style="display:flex; align-items: center; gap: 8px;">
+                                <div style="font-size: 1.1rem; font-weight: 700; color: var(--success);">+${this.formatCurrency(i.amount)}</div>
+                                <i data-lucide="edit-2" style="width:14px;height:14px; cursor:pointer; color:var(--text-muted);" onclick="app.showEditIncomeModal('${i.id}')"></i>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="text-align: right; margin-top: 12px; font-size: 0.9rem; font-weight: 700; color: var(--success);">
+                    Total Ingresado: ${this.formatCurrency(this.store.getTotalIncomes())}
+                </div>
+            </div>
+        `;
+        this.mainContent.innerHTML = html;
+    }
+
+    showProjectsView() {
+        this.navItems.forEach(n => n.classList.remove('active'));
+        this.currentView = 'projects';
+        
+        const projects = this.store.data.projects;
+        let html = `
+            <div class="card" style="background: var(--bg-surface);">
+                <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 8px;"><i data-lucide="database" style="width:16px;height:16px; vertical-align:text-bottom;"></i> Respaldo de Datos (Nube/Local)</div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-outline" style="flex:1; font-size:0.8rem; padding:8px;" onclick="app.store.exportBackup()"><i data-lucide="download"></i> Guardar</button>
+                    <button class="btn btn-outline" style="flex:1; font-size:0.8rem; padding:8px;" onclick="document.getElementById('backup-upload').click()"><i data-lucide="upload"></i> Restaurar</button>
+                    <input type="file" id="backup-upload" style="display:none;" accept=".json" onchange="app.handleRestoreBackup(event)">
+                </div>
+            </div>
+
+            <div class="flex-between mb-2 mt-4">
+                <h2 style="font-size: 1.5rem; font-weight: 700;">Tus Proyectos</h2>
+                <button class="btn btn-primary" style="width: auto; padding: 10px 16px;" onclick="app.showCreateProjectModal()">
+                    <i data-lucide="plus"></i> Nuevo
+                </button>
+            </div>
+        `;
+
+        if (projects.length === 0) {
+            html += `
+                <div style="text-align: center; padding: 40px 20px; background: var(--bg-surface); border-radius: var(--border-radius);">
+                    <i data-lucide="hard-hat" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                    <p style="color: var(--text-secondary);">No tienes proyectos. Crea uno nuevo para empezar.</p>
+                </div>
+            `;
+        } else {
+            html += `<div style="display: flex; flex-direction: column; gap: 16px;">`;
+            projects.forEach(p => {
+                const isActive = p.id === this.store.data.currentProjectId;
+                const totalBudget = p.budgets.reduce((s,b)=>s+b.amount, 0);
+                html += `
+                    <div class="card" style="margin-bottom: 0; cursor: pointer; border: 2px solid ${isActive ? 'var(--primary)' : 'transparent'};" onclick="app.selectProject('${p.id}')">
+                        <div class="flex-between mb-1">
+                            <div style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                                ${p.name}
+                                <i data-lucide="edit" style="width: 16px; height: 16px; color: var(--text-muted); cursor: pointer;" onclick="event.stopPropagation(); app.showEditProjectModal('${p.id}')"></i>
+                            </div>
+                            ${isActive ? '<span style="background: var(--primary-light); color: var(--primary-dark); font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: 600;">Activo</span>' : ''}
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);" class="flex-between">
+                            <span>Presupuesto: ${this.formatCurrency(totalBudget)}</span>
+                            <span>Área: ${p.area || 0} m²</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+        }
+
+        this.mainContent.innerHTML = html;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    selectProject(id) {
+        this.store.setCurrentProject(id);
+        this.updateHeader();
+        this.navItems[0].click();
+    }
+
+    async handleRestoreBackup(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (confirm("Restaurar un respaldo reemplazará los proyectos actuales. ¿Continuar?")) {
+            try {
+                await this.store.restoreBackup(file);
+                alert("Respaldo restaurado con éxito.");
+                this.updateHeader();
+                this.showProjectsView();
+            } catch(error) {
+                alert("Error al restaurar: " + error.message);
+            }
+        }
+        e.target.value = '';
+    }
+
+    // ==========================================
+    // Modals & Handlers
+    // ==========================================
+
+    openModal(html) {
+        this.modalOverlay.innerHTML = `<div class="modal-content" onclick="event.stopPropagation()">${html}</div>`;
+        this.modalOverlay.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    closeModal() {
+        this.modalOverlay.classList.add('hidden');
+        setTimeout(() => { this.modalOverlay.innerHTML = ''; }, 300);
+    }
+
+    // --- Create Project ---
+    showCreateProjectModal() {
+        this.openModal(`
+            <div class="modal-header"><h2>Nuevo Proyecto</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Nombre de la Obra</label><input type="text" id="inp-proj-name" class="form-control" placeholder="Ej. Casa Valle"></div>
+            <div class="form-group"><label class="form-label">Presupuesto Principal ($)</label><input type="number" id="inp-proj-budget" class="form-control" placeholder="0.00"></div>
+            <div class="form-group"><label class="form-label">Metros Cuadrados de Construcción (m²)</label><input type="number" id="inp-proj-area" class="form-control" placeholder="Ej. 150"></div>
+            <button class="btn btn-primary" onclick="app.handleCreateProject()">Crear Proyecto</button>
+        `);
+    }
+    handleCreateProject() {
+        const name = document.getElementById('inp-proj-name').value;
+        const budget = document.getElementById('inp-proj-budget').value;
+        const area = document.getElementById('inp-proj-area').value;
+        if (!name) return alert('El nombre es requerido');
+        this.store.createProject(name, budget, area);
+        this.closeModal();
+        this.updateHeader();
+        this.navItems[0].click();
+    }
+
+    // --- Edit Project ---
+    showEditProjectModal(id) {
+        const project = this.store.data.projects.find(p => p.id === id);
+        if (!project) return;
+        this.openModal(`
+            <div class="modal-header"><h2>Editar Proyecto</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Nombre de la Obra</label><input type="text" id="inp-edit-proj-name" class="form-control" value="${project.name}"></div>
+            <div class="form-group"><label class="form-label">Metros Cuadrados de Construcción (m²)</label><input type="number" id="inp-edit-proj-area" class="form-control" value="${project.area || 0}"></div>
+            <button class="btn btn-primary" onclick="app.handleEditProject('${id}')">Guardar Cambios</button>
+        `);
+    }
+    handleEditProject(id) {
+        const name = document.getElementById('inp-edit-proj-name').value;
+        const area = document.getElementById('inp-edit-proj-area').value;
+        if (!name) return alert('El nombre es requerido');
+        this.store.editProject(id, name, area);
+        this.closeModal();
+        this.updateHeader();
+        this.showProjectsView();
+    }
+
+    // --- FAB Menu ---
+    showAddMenuModal() {
+        if (!this.store.getCurrentProject()) return alert("Primero selecciona o crea un proyecto.");
+        this.openModal(`
+            <div class="modal-header"><h2>¿Qué deseas registrar?</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                <button class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; margin: 0; cursor: pointer; border: none; background: #fffaf0;" onclick="app.showAddExpenseModal('material')">
+                    <i data-lucide="package" style="width: 32px; height: 32px; color: var(--primary); margin-bottom: 12px;"></i><span style="font-weight: 600; color: var(--text-primary);">Material</span>
+                </button>
+                <button class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; margin: 0; cursor: pointer; border: none; background: #eff6ff;" onclick="app.showAddExpenseModal('labor')">
+                    <i data-lucide="users" style="width: 32px; height: 32px; color: var(--info); margin-bottom: 12px;"></i><span style="font-weight: 600; color: var(--text-primary);">Mano de Obra</span>
+                </button>
+            </div>
+        `);
+    }
+
+    // --- Expenses ---
+    getBudgetOptionsHtml(selectedId = '') {
+        const p = this.store.getCurrentProject();
+        return p.budgets.map(b => `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.name} (${this.formatCurrency(b.amount)})</option>`).join('');
+    }
+
+    showAddExpenseModal(type) {
+        const title = type === 'material' ? 'Nuevo Gasto: Material' : 'Nuevo Gasto: Mano de Obra';
+        this.openModal(`
+            <div class="modal-header"><h2>${title}</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">A qué presupuesto cargarlo</label><select id="inp-exp-budget" class="form-control" style="appearance:auto;">${this.getBudgetOptionsHtml()}</select></div>
+            <div class="form-group"><label class="form-label">Descripción</label><input type="text" id="inp-exp-desc" class="form-control" placeholder="Ej. Bultos de cemento"></div>
+            <div class="form-group"><label class="form-label">Monto ($)</label><input type="number" id="inp-exp-amount" class="form-control" placeholder="0.00"></div>
+            <button class="btn btn-primary" onclick="app.handleAddExpense('${type}')">Guardar Gasto</button>
+        `);
+    }
+    handleAddExpense(type) {
+        const desc = document.getElementById('inp-exp-desc').value;
+        const amount = document.getElementById('inp-exp-amount').value;
+        const budgetId = document.getElementById('inp-exp-budget').value;
+        if (!desc || !amount) return alert('Todos los campos son requeridos');
+        this.store.addExpense(type, amount, desc, budgetId);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+
+    showEditExpenseModal(id) {
+        const exp = this.store.getCurrentProject().expenses.find(e => e.id === id);
+        if (!exp) return;
+        this.openModal(`
+            <div class="modal-header"><h2>Editar Gasto</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">A qué presupuesto cargarlo</label><select id="inp-edit-exp-budget" class="form-control" style="appearance:auto;">${this.getBudgetOptionsHtml(exp.budgetId)}</select></div>
+            <div class="form-group"><label class="form-label">Descripción</label><input type="text" id="inp-edit-exp-desc" class="form-control" value="${exp.description}"></div>
+            <div class="form-group"><label class="form-label">Monto ($)</label><input type="number" id="inp-edit-exp-amount" class="form-control" value="${exp.amount}"></div>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-outline" style="flex: 1; color: var(--danger); border-color: var(--danger);" onclick="app.handleDeleteExpense('${id}')"><i data-lucide="trash-2"></i> Eliminar</button>
+                <button class="btn btn-primary" style="flex: 2;" onclick="app.handleEditExpense('${id}')">Guardar</button>
+            </div>
+        `);
+    }
+    handleEditExpense(id) {
+        const desc = document.getElementById('inp-edit-exp-desc').value;
+        const amount = document.getElementById('inp-edit-exp-amount').value;
+        const budgetId = document.getElementById('inp-edit-exp-budget').value;
+        if (!desc || !amount) return alert('Todos los campos son requeridos');
+        this.store.editExpense(id, amount, desc, budgetId);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+    handleDeleteExpense(id) {
+        if (confirm('¿Estás seguro de que deseas eliminar este gasto?')) {
+            this.store.deleteExpense(id);
+            this.closeModal();
+            this.renderView(this.currentView);
+        }
+    }
+
+    // --- Budgets ---
+    showAddBudgetModal() {
+        this.openModal(`
+            <div class="modal-header"><h2>Nuevo Presupuesto Adicional</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Nombre del Segmento</label><input type="text" id="inp-budg-name" class="form-control" placeholder="Ej. Acabados extra"></div>
+            <div class="form-group"><label class="form-label">Monto ($)</label><input type="number" id="inp-budg-amount" class="form-control" placeholder="0.00"></div>
+            <button class="btn btn-primary" onclick="app.handleAddBudget()">Crear Presupuesto</button>
+        `);
+    }
+    handleAddBudget() {
+        const name = document.getElementById('inp-budg-name').value;
+        const amount = document.getElementById('inp-budg-amount').value;
+        if (!name || !amount) return alert('Campos requeridos');
+        this.store.addBudget(name, amount);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+    showEditBudgetModal(id) {
+        const b = this.store.getCurrentProject().budgets.find(x => x.id === id);
+        this.openModal(`
+            <div class="modal-header"><h2>Editar Presupuesto</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Nombre</label><input type="text" id="inp-edit-budg-name" class="form-control" value="${b.name}"></div>
+            <div class="form-group"><label class="form-label">Monto ($)</label><input type="number" id="inp-edit-budg-amount" class="form-control" value="${b.amount}"></div>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-outline" style="flex: 1; color: var(--danger); border-color: var(--danger);" onclick="app.handleDeleteBudget('${id}')"><i data-lucide="trash-2"></i> Eliminar</button>
+                <button class="btn btn-primary" style="flex: 2;" onclick="app.handleEditBudget('${id}')">Guardar</button>
+            </div>
+        `);
+    }
+    handleEditBudget(id) {
+        const name = document.getElementById('inp-edit-budg-name').value;
+        const amount = document.getElementById('inp-edit-budg-amount').value;
+        if (!name || !amount) return alert('Campos requeridos');
+        this.store.editBudget(id, name, amount);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+    handleDeleteBudget(id) {
+        if (id === 'main') return alert('No puedes eliminar el presupuesto principal.');
+        if (confirm('¿Eliminar este segmento? Sus gastos se moverán al presupuesto principal.')) {
+            this.store.deleteBudget(id);
+            this.closeModal();
+            this.renderView(this.currentView);
+        }
+    }
+
+    // --- Incomes ---
+    showAddIncomeModal() {
+        this.openModal(`
+            <div class="modal-header"><h2>Registrar Anticipo/Ingreso</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Concepto</label><input type="text" id="inp-inc-desc" class="form-control" placeholder="Ej. Adelanto inicial"></div>
+            <div class="form-group"><label class="form-label">Monto Recibido ($)</label><input type="number" id="inp-inc-amount" class="form-control" placeholder="0.00"></div>
+            <button class="btn btn-primary" onclick="app.handleAddIncome()">Guardar Ingreso</button>
+        `);
+    }
+    handleAddIncome() {
+        const desc = document.getElementById('inp-inc-desc').value;
+        const amount = document.getElementById('inp-inc-amount').value;
+        if (!desc || !amount) return alert('Campos requeridos');
+        this.store.addIncome(desc, amount);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+    showEditIncomeModal(id) {
+        const inc = this.store.getCurrentProject().incomes.find(x => x.id === id);
+        this.openModal(`
+            <div class="modal-header"><h2>Editar Ingreso</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Concepto</label><input type="text" id="inp-edit-inc-desc" class="form-control" value="${inc.description}"></div>
+            <div class="form-group"><label class="form-label">Monto ($)</label><input type="number" id="inp-edit-inc-amount" class="form-control" value="${inc.amount}"></div>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-outline" style="flex: 1; color: var(--danger); border-color: var(--danger);" onclick="app.handleDeleteIncome('${id}')"><i data-lucide="trash-2"></i> Eliminar</button>
+                <button class="btn btn-primary" style="flex: 2;" onclick="app.handleEditIncome('${id}')">Guardar</button>
+            </div>
+        `);
+    }
+    handleEditIncome(id) {
+        const desc = document.getElementById('inp-edit-inc-desc').value;
+        const amount = document.getElementById('inp-edit-inc-amount').value;
+        if (!desc || !amount) return alert('Campos requeridos');
+        this.store.editIncome(id, desc, amount);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+    handleDeleteIncome(id) {
+        if (confirm('¿Eliminar este ingreso?')) {
+            this.store.deleteIncome(id);
+            this.closeModal();
+            this.renderView(this.currentView);
+        }
+    }
+
+    // --- Pending Labor ---
+    showEditPendingLaborModal() {
+        const currentPending = this.store.getCurrentProject().pendingLabor || 0;
+        this.openModal(`
+            <div class="modal-header"><h2>Modificar Pendiente Mano de Obra</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Monto Pendiente Actual ($)</label><input type="number" id="inp-pend-labor" class="form-control" value="${currentPending}"></div>
+            <button class="btn btn-primary" onclick="app.handleEditPendingLabor()">Guardar</button>
+        `);
+    }
+    handleEditPendingLabor() {
+        const amount = document.getElementById('inp-pend-labor').value;
+        if (amount === '') return alert('Ingresa un monto');
+        this.store.setPendingLabor(amount);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+
+    // --- Phases ---
+    showAddPhaseModal() {
+        this.openModal(`
+            <div class="modal-header"><h2>Nueva Fase de Obra</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Nombre de Fase / Actividad</label><input type="text" id="inp-phase-name" class="form-control" placeholder="Ej. Zapatas"></div>
+            <div class="form-group"><label class="form-label">Cantidad Total Esperada</label><input type="number" id="inp-phase-total" class="form-control" placeholder="Ej. 50"></div>
+            <div class="form-group">
+                <label class="form-label">Unidad de Medida</label>
+                <select id="inp-phase-unit" class="form-control" style="appearance:auto;">
+                    <option value="m³">Metros Cúbicos (m³)</option>
+                    <option value="m²">Metros Cuadrados (m²)</option>
+                    <option value="ml">Metros Lineales (ml)</option>
+                    <option value="pie²">Pies Cuadrados (pie²)</option>
+                    <option value="pie">Pies (pie)</option>
+                    <option value="pl">Pies Lineales (pl)</option>
+                    <option value="UD">Unidad (UD)</option>
+                    <option value="PA">Partida Alzada (PA)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="app.handleAddPhase()">Crear Fase</button>
+        `);
+    }
+    handleAddPhase() {
+        const name = document.getElementById('inp-phase-name').value;
+        const total = document.getElementById('inp-phase-total').value;
+        const unit = document.getElementById('inp-phase-unit').value;
+        if (!name || !total) return alert('Campos requeridos');
+        this.store.addPhase(name, total, unit);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+    showEditPhaseModal(id) {
+        const phase = this.store.getCurrentProject().phases.find(x => x.id === id);
+        this.openModal(`
+            <div class="modal-header"><h2>Editar Fase</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Nombre de Fase</label><input type="text" id="inp-edit-phase-name" class="form-control" value="${phase.name}"></div>
+            <div class="form-group"><label class="form-label">Cantidad Total</label><input type="number" id="inp-edit-phase-total" class="form-control" value="${phase.totalAmount}"></div>
+            <div class="form-group">
+                <label class="form-label">Unidad</label>
+                <select id="inp-edit-phase-unit" class="form-control" style="appearance:auto;">
+                    <option value="m³" ${phase.unit==='m³'?'selected':''}>m³</option>
+                    <option value="m²" ${phase.unit==='m²'?'selected':''}>m²</option>
+                    <option value="ml" ${phase.unit==='ml'?'selected':''}>ml</option>
+                    <option value="pie²" ${phase.unit==='pie²'?'selected':''}>pie²</option>
+                    <option value="pie" ${phase.unit==='pie'?'selected':''}>pie</option>
+                    <option value="pl" ${phase.unit==='pl'?'selected':''}>pl</option>
+                    <option value="UD" ${phase.unit==='UD'?'selected':''}>UD</option>
+                    <option value="PA" ${phase.unit==='PA'?'selected':''}>PA</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-outline" style="flex: 1; color: var(--danger); border-color: var(--danger);" onclick="app.handleDeletePhase('${id}')"><i data-lucide="trash-2"></i> Eliminar</button>
+                <button class="btn btn-primary" style="flex: 2;" onclick="app.handleEditPhase('${id}')">Guardar</button>
+            </div>
+        `);
+    }
+    handleEditPhase(id) {
+        const name = document.getElementById('inp-edit-phase-name').value;
+        const total = document.getElementById('inp-edit-phase-total').value;
+        const unit = document.getElementById('inp-edit-phase-unit').value;
+        if (!name || !total) return alert('Campos requeridos');
+        this.store.editPhase(id, name, total, unit);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+    handleDeletePhase(id) {
+        if (confirm('¿Eliminar esta fase y todos sus registros de progreso?')) {
+            this.store.deletePhase(id);
+            this.closeModal();
+            this.renderView(this.currentView);
+        }
+    }
+
+    // --- Phase Progress ---
+    showAddProgressToPhaseModal(phaseId) {
+        this.openModal(`
+            <div class="modal-header"><h2>Registrar Avance</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Cantidad Ejecutada</label><input type="number" id="inp-prog-amount" class="form-control" placeholder="0.0"></div>
+            <button class="btn btn-primary" onclick="app.handleAddProgressToPhase('${phaseId}')">Guardar Avance</button>
+        `);
+    }
+    handleAddProgressToPhase(phaseId) {
+        const amount = document.getElementById('inp-prog-amount').value;
+        if (!amount) return alert('Ingresa cantidad');
+        this.store.addProgressToPhase(phaseId, amount);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+    showEditProgressModal(phaseId, progressId) {
+        const phase = this.store.getCurrentProject().phases.find(x => x.id === phaseId);
+        const prog = phase.progress.find(p => p.id === progressId);
+        this.openModal(`
+            <div class="modal-header"><h2>Editar Avance</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
+            <div class="form-group"><label class="form-label">Cantidad Ejecutada</label><input type="number" id="inp-edit-prog-amount" class="form-control" value="${prog.amount}"></div>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-outline" style="flex: 1; color: var(--danger); border-color: var(--danger);" onclick="app.handleDeleteProgress('${phaseId}', '${progressId}')"><i data-lucide="trash-2"></i> Eliminar</button>
+                <button class="btn btn-primary" style="flex: 2;" onclick="app.handleEditProgress('${phaseId}', '${progressId}')">Guardar</button>
+            </div>
+        `);
+    }
+    handleEditProgress(phaseId, progressId) {
+        const amount = document.getElementById('inp-edit-prog-amount').value;
+        if (!amount) return alert('Ingresa cantidad');
+        this.store.editProgress(phaseId, progressId, amount);
+        this.closeModal();
+        this.renderView(this.currentView);
+    }
+    handleDeleteProgress(phaseId, progressId) {
+        if (confirm('¿Eliminar este registro de avance?')) {
+            this.store.deleteProgress(phaseId, progressId);
+            this.closeModal();
+            this.renderView(this.currentView);
+        }
+    }
+
+    // --- CSV Import ---
+    showImportCSVModal() {
+        this.openModal(`
+            <div class="modal-header">
+                <h2>Importar Partidas (CSV)</h2>
+                <button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">El archivo CSV desde Excel debe tener 3 columnas (sin encabezado):<br><code>Nombre, Cantidad, Unidad</code><br>Ejemplo: <code>Muros de Block, 150, m2</code></p>
+            <div class="form-group">
+                <input type="file" id="csv-upload" class="form-control" accept=".csv">
+            </div>
+            <button class="btn btn-primary" onclick="app.handleImportCSV()">Importar</button>
+        `);
+    }
+
+    handleImportCSV() {
+        const fileInput = document.getElementById('csv-upload');
+        const file = fileInput.files[0];
+        if (!file) return alert('Selecciona un archivo CSV');
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target.result;
+            const lines = text.split('\\n');
+            let count = 0;
+            lines.forEach(line => {
+                if (line.trim() === '') return;
+                const parts = line.split(',');
+                if (parts.length >= 3) {
+                    const name = parts[0].trim();
+                    const total = parts[1].trim();
+                    const unit = parts[2].trim();
+                    if (name && total && !isNaN(parseFloat(total))) {
+                        this.store.addPhase(name, total, unit);
+                        count++;
+                    }
+                }
+            });
+            this.closeModal();
+            alert(`Se importaron ${count} partidas con éxito.`);
+            this.renderView('progress');
+        };
+        reader.readAsText(file);
+    }
+
+    showPDFOptionsModal() {
+        this.openModal(`
+            <div class="modal-header">
+                <h2>Configurar Informe</h2>
+                <button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
+                    <input type="checkbox" id="pdf-opt-materials" checked style="width:20px;height:20px;">
+                    <span style="font-weight:600;">Incluir Materiales</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
+                    <input type="checkbox" id="pdf-opt-labor" checked style="width:20px;height:20px;">
+                    <span style="font-weight:600;">Incluir Mano de Obra</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" id="pdf-opt-incomes" checked style="width:20px;height:20px;">
+                    <span style="font-weight:600;">Incluir Anticipos (Ingresos)</span>
+                </label>
+            </div>
+            <button class="btn btn-primary" onclick="app.generatePDFReport()">Generar y Descargar PDF</button>
+        `);
+    }
+
+    generatePDFReport() {
+        const includeMaterials = document.getElementById('pdf-opt-materials').checked;
+        const includeLabor = document.getElementById('pdf-opt-labor').checked;
+        const includeIncomes = document.getElementById('pdf-opt-incomes').checked;
+        
+        this.closeModal();
+
+        const project = this.store.getCurrentProject();
+        let expenses = project.expenses.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+        
+        expenses = expenses.filter(e => {
+            if (e.type === 'material' && !includeMaterials) return false;
+            if (e.type === 'labor' && !includeLabor) return false;
+            return true;
+        });
+
+        const filteredExpensesTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
+        
+        let incomesHtml = '';
+        if (includeIncomes && project.incomes.length > 0) {
+            incomesHtml = `
+                <h3 style="margin-top:20px; border-bottom: 1px solid #ccc;">Anticipos Entregados</h3>
+                <table class="print-table">
+                    <thead><tr><th>Fecha</th><th>Concepto</th><th>Monto</th></tr></thead>
+                    <tbody>
+                        ${project.incomes.map(i => `<tr><td>${new Date(i.date).toLocaleDateString()}</td><td>${i.description}</td><td style="text-align:right;">${this.formatCurrency(i.amount)}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        let html = `
+            <div class="print-header">
+                <h1 style="margin:0; font-size:24px;">Informe Financiero de Proyecto</h1>
+                <p style="margin:5px 0;"><strong>Obra:</strong> ${project.name}</p>
+                <p style="margin:5px 0;"><strong>Fecha de Generación:</strong> ${new Date().toLocaleDateString()}</p>
+            </div>
+            
+            <div class="print-summary">
+                <div><strong>Presupuesto Total:</strong> ${this.formatCurrency(this.store.getTotalBudget())}</div>
+                <div><strong>Total de los Gastos Mostrados:</strong> ${this.formatCurrency(filteredExpensesTotal)}</div>
+                ${includeIncomes ? `<div><strong>Ingresos (Anticipos Totales):</strong> ${this.formatCurrency(this.store.getTotalIncomes())}</div>` : ''}
+                <div><strong>Ganancia Real (Anticipos - Gastos):</strong> ${this.formatCurrency(this.store.getTotalIncomes() - this.store.getTotalExpenses())}</div>
+            </div>
+
+            <h3 style="border-bottom: 1px solid #ccc;">Desglose de Gastos</h3>
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Presupuesto Asignado</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${expenses.map(e => {
+                        const b = project.budgets.find(x => x.id === e.budgetId);
+                        return `
+                        <tr>
+                            <td>${new Date(e.date).toLocaleDateString()}</td>
+                            <td>${e.type === 'material' ? 'Material' : 'Mano de Obra'}</td>
+                            <td>${e.description}</td>
+                            <td>${b ? b.name : 'Principal'}</td>
+                            <td style="text-align:right;">${this.formatCurrency(e.amount)}</td>
+                        </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+            ${incomesHtml}
+        `;
+        
+        this.printArea.innerHTML = html;
+        setTimeout(() => {
+            window.print();
+        }, 100);
+    }
+
+    showExecutiveSummaryOptionsModal() {
+        this.openModal(`
+            <div class="modal-header">
+                <h2>Configurar Resumen Ejecutivo</h2>
+                <button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
+                    <input type="checkbox" id="exec-opt-finance" checked style="width:20px;height:20px;">
+                    <span style="font-weight:600;">1. Salud Financiera (Presupuesto, Ganancias)</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
+                    <input type="checkbox" id="exec-opt-incomes" checked style="width:20px;height:20px;">
+                    <span style="font-weight:600;">2. Ingresos (Anticipos Recibidos)</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
+                    <input type="checkbox" id="exec-opt-materials" checked style="width:20px;height:20px;">
+                    <span style="font-weight:600;">3. Desglose de Gastos de Materiales</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
+                    <input type="checkbox" id="exec-opt-labor" checked style="width:20px;height:20px;">
+                    <span style="font-weight:600;">4. Desglose de Gastos de Mano de Obra</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" id="exec-opt-completed" checked style="width:20px;height:20px;">
+                    <span style="font-weight:600;">5. Partidas 100% Completadas</span>
+                </label>
+            </div>
+            <button class="btn btn-primary" onclick="app.generateExecutiveSummaryPDF()">Generar PDF a la Medida</button>
+        `);
+    }
+
+    generateExecutiveSummaryPDF() {
+        const incFinance = document.getElementById('exec-opt-finance') ? document.getElementById('exec-opt-finance').checked : true;
+        const incIncomes = document.getElementById('exec-opt-incomes') ? document.getElementById('exec-opt-incomes').checked : true;
+        const incMat = document.getElementById('exec-opt-materials') ? document.getElementById('exec-opt-materials').checked : true;
+        const incLab = document.getElementById('exec-opt-labor') ? document.getElementById('exec-opt-labor').checked : true;
+        const incComp = document.getElementById('exec-opt-completed') ? document.getElementById('exec-opt-completed').checked : true;
+        
+        this.closeModal();
+        const project = this.store.getCurrentProject();
+        if (!project) return;
+
+        const totalBudget = this.store.getTotalBudget();
+        const totalIncomes = this.store.getTotalIncomes();
+        const ac = this.store.getTotalExpenses();
+        const profit = totalIncomes - ac;
+        const profitMargin = totalIncomes > 0 ? (profit / totalIncomes) * 100 : 0;
+        const budgetPercent = totalBudget > 0 ? (ac / totalBudget) * 100 : 0;
+        
+        const completedPhases = this.store.getCompletedPhases();
+
+        let html = `
+            <div class="print-header">
+                <h1 style="margin:0; font-size:26px;">Resumen Ejecutivo de Obra</h1>
+                <p style="margin:5px 0;"><strong>Proyecto:</strong> ${project.name}</p>
+                <p style="margin:5px 0;"><strong>Fecha de Corte:</strong> ${new Date().toLocaleDateString()}</p>
+            </div>
+        `;
+
+        if (incFinance) {
+            html += `
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px;">Salud Financiera</h3>
+                <div class="print-summary">
+                    <div><strong>Presupuesto Total:</strong> ${this.formatCurrency(totalBudget)}</div>
+                    <div><strong>Costo Real (Gastos Totales):</strong> ${this.formatCurrency(ac)}</div>
+                    <div><strong>Consumo de Presupuesto:</strong> ${budgetPercent.toFixed(1)}%</div>
+                    <div><strong>Anticipos Recibidos (Ingresos):</strong> ${this.formatCurrency(totalIncomes)}</div>
+                    <div><strong>Ganancia Real:</strong> ${this.formatCurrency(profit)} (${profitMargin.toFixed(1)}%)</div>
+                    <div><strong>Estado:</strong> ${profit >= 0 ? 'Saludable (Balance Positivo)' : 'Alerta (Déficit)'}</div>
+                </div>
+            `;
+        }
+
+        if (incIncomes && project.incomes.length > 0) {
+            html += `
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-top: 30px;">Ingresos (Anticipos Recibidos)</h3>
+                <table class="print-table">
+                    <thead><tr><th>Fecha</th><th>Concepto</th><th>Monto</th></tr></thead>
+                    <tbody>
+                        ${project.incomes.map(i => `<tr><td>${new Date(i.date).toLocaleDateString()}</td><td>${i.description}</td><td style="text-align:right;">${this.formatCurrency(i.amount)}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        const materials = project.expenses.filter(e => e.type === 'material').sort((a,b) => new Date(a.date) - new Date(b.date));
+        if (incMat && materials.length > 0) {
+            html += `
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-top: 30px;">Desglose de Gastos: Materiales</h3>
+                <table class="print-table">
+                    <thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead>
+                    <tbody>
+                        ${materials.map(e => `<tr><td>${new Date(e.date).toLocaleDateString()}</td><td>${e.description}</td><td style="text-align:right;">${this.formatCurrency(e.amount)}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        const labor = project.expenses.filter(e => e.type === 'labor').sort((a,b) => new Date(a.date) - new Date(b.date));
+        if (incLab && labor.length > 0) {
+            html += `
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-top: 30px;">Desglose de Gastos: Mano de Obra</h3>
+                <table class="print-table">
+                    <thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead>
+                    <tbody>
+                        ${labor.map(e => `<tr><td>${new Date(e.date).toLocaleDateString()}</td><td>${e.description}</td><td style="text-align:right;">${this.formatCurrency(e.amount)}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        if (incComp) {
+            html += `
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-top: 30px;">Partidas Listas para Cobro (100% Completadas)</h3>
+                ${completedPhases.length === 0 ? '<p>No hay partidas completadas al 100% hasta la fecha.</p>' : `
+                <table class="print-table">
+                    <thead>
+                        <tr>
+                            <th>Partida (Fase)</th>
+                            <th>Cantidad Total Ejecutada</th>
+                            <th>Unidad</th>
+                            <th>Estatus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${completedPhases.map(p => `
+                            <tr>
+                                <td>${p.name}</td>
+                                <td style="text-align:center;">${p.totalAmount}</td>
+                                <td style="text-align:center;">${p.unit}</td>
+                                <td style="text-align:center; font-weight:bold; color:green;">100% Lista</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                `}
+            `;
+        }
+        
+        this.printArea.innerHTML = html;
+        setTimeout(() => {
+            window.print();
+        }, 100);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.app = new AppUI(window.appStore);
+});
+
+</script>
+    <script>
+        // Initialize Icons safely
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./service-worker.js');
+        }
+    </script>
+</html>
