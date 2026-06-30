@@ -578,10 +578,17 @@ class Store {
                     name: 'Avance General',
                     totalAmount: p.progress.reduce((sum, prog) => sum + prog.amount, 0),
                     unit: p.progress[0].unit || 'm²',
-                    progress: p.progress
+                    progress: p.progress,
+                    budgetAmount: 0,
+                    paidAmount: 0
                 });
             }
             delete p.progress;
+        } else {
+            p.phases.forEach(phase => {
+                if (phase.budgetAmount === undefined) phase.budgetAmount = 0;
+                if (phase.paidAmount === undefined) phase.paidAmount = 0;
+            });
         }
         if (p.expenses) {
             p.expenses.forEach(e => {
@@ -808,7 +815,7 @@ class Store {
     }
 
     // Phases & Progress API
-    addPhase(name, totalAmount, unit) {
+    addPhase(name, totalAmount, unit, budgetAmount = 0, paidAmount = 0) {
         const project = this.getCurrentProject();
         if (project) {
             project.phases.push({
@@ -816,13 +823,15 @@ class Store {
                 name: name,
                 totalAmount: parseFloat(totalAmount) || 0,
                 unit: unit,
-                progress: []
+                progress: [],
+                budgetAmount: parseFloat(budgetAmount) || 0,
+                paidAmount: parseFloat(paidAmount) || 0
             });
             this.saveData();
         }
     }
 
-    editPhase(id, name, totalAmount, unit) {
+    editPhase(id, name, totalAmount, unit, budgetAmount, paidAmount) {
         const project = this.getCurrentProject();
         if (project) {
             const phase = project.phases.find(p => p.id === id);
@@ -830,6 +839,8 @@ class Store {
                 phase.name = name;
                 phase.totalAmount = parseFloat(totalAmount) || 0;
                 phase.unit = unit;
+                phase.budgetAmount = parseFloat(budgetAmount) || 0;
+                phase.paidAmount = parseFloat(paidAmount) || 0;
                 this.saveData();
             }
         }
@@ -1276,6 +1287,17 @@ class AppUI {
                         <div class="flex-between mb-2" style="font-size: 0.8rem;">
                             <span style="color: var(--text-muted);">Pendiente: <strong>${this.formatNumber(pending)} ${phase.unit}</strong></span>
                         </div>
+                        
+                        <div style="background: var(--bg-surface); padding: 8px; border-radius: 4px; margin-bottom: 12px; font-size: 0.8rem;">
+                            <div class="flex-between"><span>Monto Partida:</span> <strong>${this.formatCurrency(phase.budgetAmount || 0)}</strong></div>
+                            <div class="flex-between"><span>Monto Pagado:</span> <strong>${this.formatCurrency(phase.paidAmount || 0)}</strong></div>
+                            <div class="flex-between" style="margin-top: 4px; border-top: 1px solid var(--border-color); padding-top: 4px;">
+                                <span>Ganancia Real:</span>
+                                <strong style="color: ${(phase.budgetAmount || 0) - (phase.paidAmount || 0) >= 0 ? 'var(--success)' : 'var(--danger)'}">
+                                    ${this.formatCurrency((phase.budgetAmount || 0) - (phase.paidAmount || 0))}
+                                </strong>
+                            </div>
+                        </div>
 
                         <div style="background: var(--bg-main); border-radius: var(--border-radius-sm); padding: 8px;">
                             <div class="flex-between mb-1">
@@ -1391,7 +1413,12 @@ class AppUI {
 
     renderBudget(project) {
         let html = `
-            <div class="card-title mb-2">Gestión Financiera</div>
+            <div class="flex-between mb-2">
+                <div class="card-title" style="margin: 0;">Gestión Financiera</div>
+                <button class="btn btn-outline" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="app.showBudgetReportOptionsModal()">
+                    <i data-lucide="file-text" style="width:14px;height:14px;"></i> Reporte PDF
+                </button>
+            </div>
             
             <!-- SECCIÓN PRESUPUESTOS -->
             <div class="card">
@@ -1772,6 +1799,8 @@ class AppUI {
             <div class="modal-header"><h2>Nueva Fase de Obra</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
             <div class="form-group"><label class="form-label">Nombre de Fase / Actividad</label><input type="text" id="inp-phase-name" class="form-control" placeholder="Ej. Zapatas"></div>
             <div class="form-group"><label class="form-label">Cantidad Total Esperada</label><input type="number" id="inp-phase-total" class="form-control" placeholder="Ej. 50"></div>
+            <div class="form-group"><label class="form-label">Monto de Partida ($)</label><input type="number" id="inp-phase-budget" class="form-control" placeholder="0.00"></div>
+            <div class="form-group"><label class="form-label">Monto Pagado ($)</label><input type="number" id="inp-phase-paid" class="form-control" placeholder="0.00"></div>
             <div class="form-group">
                 <label class="form-label">Unidad de Medida</label>
                 <select id="inp-phase-unit" class="form-control" style="appearance:auto;">
@@ -1792,8 +1821,10 @@ class AppUI {
         const name = document.getElementById('inp-phase-name').value;
         const total = document.getElementById('inp-phase-total').value;
         const unit = document.getElementById('inp-phase-unit').value;
+        const budgetAmount = document.getElementById('inp-phase-budget').value;
+        const paidAmount = document.getElementById('inp-phase-paid').value;
         if (!name || !total) return alert('Campos requeridos');
-        this.store.addPhase(name, total, unit);
+        this.store.addPhase(name, total, unit, budgetAmount, paidAmount);
         this.closeModal();
         this.renderView(this.currentView);
     }
@@ -1803,6 +1834,8 @@ class AppUI {
             <div class="modal-header"><h2>Editar Fase</h2><button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button></div>
             <div class="form-group"><label class="form-label">Nombre de Fase</label><input type="text" id="inp-edit-phase-name" class="form-control" value="${phase.name}"></div>
             <div class="form-group"><label class="form-label">Cantidad Total</label><input type="number" id="inp-edit-phase-total" class="form-control" value="${phase.totalAmount}"></div>
+            <div class="form-group"><label class="form-label">Monto de Partida ($)</label><input type="number" id="inp-edit-phase-budget" class="form-control" value="${phase.budgetAmount || 0}"></div>
+            <div class="form-group"><label class="form-label">Monto Pagado ($)</label><input type="number" id="inp-edit-phase-paid" class="form-control" value="${phase.paidAmount || 0}"></div>
             <div class="form-group">
                 <label class="form-label">Unidad</label>
                 <select id="inp-edit-phase-unit" class="form-control" style="appearance:auto;">
@@ -1826,8 +1859,10 @@ class AppUI {
         const name = document.getElementById('inp-edit-phase-name').value;
         const total = document.getElementById('inp-edit-phase-total').value;
         const unit = document.getElementById('inp-edit-phase-unit').value;
+        const budgetAmount = document.getElementById('inp-edit-phase-budget').value;
+        const paidAmount = document.getElementById('inp-edit-phase-paid').value;
         if (!name || !total) return alert('Campos requeridos');
-        this.store.editPhase(id, name, total, unit);
+        this.store.editPhase(id, name, total, unit, budgetAmount, paidAmount);
         this.closeModal();
         this.renderView(this.currentView);
     }
@@ -2023,6 +2058,153 @@ class AppUI {
             </table>
             ${incomesHtml}
         `;
+        
+        this.printArea.innerHTML = html;
+        setTimeout(() => {
+            window.print();
+        }, 100);
+    }
+
+    showBudgetReportOptionsModal() {
+        const project = this.store.getCurrentProject();
+        if (!project) return;
+        let options = `<option value="ALL">Todos los presupuestos</option>`;
+        project.budgets.forEach(b => {
+            options += `<option value="${b.id}">${b.name}</option>`;
+        });
+        this.openModal(`
+            <div class="modal-header">
+                <h2>Opciones de Reporte</h2>
+                <button class="modal-close" onclick="app.closeModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Selecciona el Presupuesto</label>
+                <select id="report-budget-select" class="form-control" style="appearance:auto;">
+                    ${options}
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="app.generateBudgetPDFReport()">Generar y Descargar PDF</button>
+        `);
+    }
+
+    generateBudgetPDFReport() {
+        const selectEl = document.getElementById('report-budget-select');
+        const budgetId = selectEl ? selectEl.value : 'ALL';
+        this.closeModal();
+
+        const project = this.store.getCurrentProject();
+        if (!project) return;
+        
+        let targetBudgets = project.budgets;
+        if (budgetId !== 'ALL') {
+            targetBudgets = targetBudgets.filter(b => b.id === budgetId);
+        }
+
+        const totalBudgetAmount = targetBudgets.reduce((sum, b) => sum + b.amount, 0);
+
+        let targetExpenses = project.expenses;
+        if (budgetId !== 'ALL') {
+            targetExpenses = targetExpenses.filter(e => e.budgetId === budgetId);
+        }
+        const totalExpenses = targetExpenses.reduce((sum, e) => sum + e.amount, 0);
+
+        let html = `
+            <div class="print-header">
+                <h1 style="margin:0; font-size:24px;">Reporte de Presupuesto: ${budgetId === 'ALL' ? 'Todos' : targetBudgets[0].name}</h1>
+                <p style="margin:5px 0;"><strong>Obra:</strong> ${project.name}</p>
+                <p style="margin:5px 0;"><strong>Fecha de Generación:</strong> ${new Date().toLocaleDateString()}</p>
+            </div>
+            
+            <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px;">Segmentos de Presupuesto</h3>
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th>Nombre del Segmento</th>
+                        <th style="text-align:right;">Monto Asignado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${targetBudgets.map(b => `
+                        <tr>
+                            <td>${b.name}</td>
+                            <td style="text-align:right;">${this.formatCurrency(b.amount)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td style="font-weight:bold;">Total Presupuestado</td>
+                        <td style="text-align:right; font-weight:bold; color:green;">${this.formatCurrency(totalBudgetAmount)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-top:30px;">Gastos Cargados a este Presupuesto</h3>
+            ${targetExpenses.length === 0 ? '<p>No hay gastos registrados en este presupuesto.</p>' : `
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Tipo</th>
+                        <th style="text-align:right;">Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${targetExpenses.map(e => `
+                        <tr>
+                            <td>${new Date(e.date).toLocaleDateString()}</td>
+                            <td>${e.description}</td>
+                            <td>${e.type === 'material' ? 'Material' : 'Mano de Obra'}</td>
+                            <td style="text-align:right;">${this.formatCurrency(e.amount)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="font-weight:bold;">Total de Gastos</td>
+                        <td style="text-align:right; font-weight:bold; color:red;">${this.formatCurrency(totalExpenses)}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="font-weight:bold;">Balance (Presupuesto - Gastos)</td>
+                        <td style="text-align:right; font-weight:bold; color:${totalBudgetAmount - totalExpenses >= 0 ? 'green' : 'red'};">${this.formatCurrency(totalBudgetAmount - totalExpenses)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            `}
+        `;
+
+        if (budgetId === 'ALL') {
+            html += `
+            <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-top:30px;">Anticipos Entregados (Ingresos)</h3>
+            ${project.incomes.length === 0 ? '<p>No hay anticipos registrados.</p>' : `
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th style="text-align:right;">Monto Recibido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${project.incomes.map(i => `
+                        <tr>
+                            <td>${new Date(i.date).toLocaleDateString()}</td>
+                            <td>${i.description}</td>
+                            <td style="text-align:right;">${this.formatCurrency(i.amount)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" style="font-weight:bold;">Total Ingresado</td>
+                        <td style="text-align:right; font-weight:bold; color:green;">${this.formatCurrency(this.store.getTotalIncomes())}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            `}
+            `;
+        }
         
         this.printArea.innerHTML = html;
         setTimeout(() => {
